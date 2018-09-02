@@ -13,14 +13,14 @@ import (
 func Server(thingService things.Service) http.Handler {
 	mux := mux.NewRouter()
 	mux.HandleFunc("/api/things", GetThings(thingService)).Methods("GET")
-	mux.Handle("/*", http.FileServer(http.Dir("www/dist/")))
+	mux.PathPrefix("/").Handler(http.FileServer(http.Dir("www/dist/www/")))
 	return mux
 }
 
 // GetThings is the endpoint for GET /api/things
 //
 // Load the things, and write them
-func GetThings(thingService things.Service) func(http.ResponseWriter, *http.Request) {
+func GetThings(thingService things.Service) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		things, err := thingService.GetThings()
 		if err != nil {
@@ -30,7 +30,7 @@ func GetThings(thingService things.Service) func(http.ResponseWriter, *http.Requ
 			log.Add("Request", r).Add("Error", err).Error("GET /api/things: failed to json.Marshal(things)")
 			w.WriteHeader(500)
 		} else {
-			w.Header().Add("Content-Type", "text/json")
+			w.Header().Add("Content-Type", "application/json")
 			w.Write(json)
 		}
 	}
