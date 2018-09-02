@@ -1,0 +1,9 @@
+<!--The content below is only a placeholder and can be replaced.-->
+<nav>
+  <input (keyup)="onSearch($event)" placeholder="search text">
+</nav>
+<ng-container *ngIf="{things: thingService.data$ | async} as async">
+  <ng-container *ngFor="let thing of async.things | filter : search">
+    <article [thing]="thing"></article>
+  </ng-container>
+</ng-container>
