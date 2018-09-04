@@ -3,12 +3,12 @@
   <input matInput (keyup)="onSearch($event)" placeholder="Search things" value="">
 </mat-form-field>
 <ng-container *ngIf="{things: thingService.data$ | async} as async">
-  <mat-list fxHide fxShow.sm fxShow.xs>
+  <mat-list fxHide.gt fxHide.lg fxHide.md>
     <ng-container *ngFor="let thing of async.things | filter : search">
       <app-thing-li [thing]="thing"></app-thing-li>
     </ng-container>
   </mat-list>
-  <div fxHide fxShow.gt fxShow.lg fxShow.md>
+  <div fxHide.sm fxHide.xs>
     <ng-container *ngFor="let thing of async.things | filter : search">
       <app-thing-card [thing]="thing"></app-thing-card>
     </ng-container>
