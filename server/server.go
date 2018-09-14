@@ -1,20 +1,20 @@
-package main
+package server
 
 import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/gorilla/mux"
 	"github.com/zachtaylor/search-demo/things"
+	"ztaylor.me/http/mux"
 	"ztaylor.me/log"
 )
 
-// Server returns a http.Handler with provided services injected
-func Server(thingService things.Service) http.Handler {
-	mux := mux.NewRouter()
-	mux.HandleFunc("/api/things", GetThings(thingService)).Methods("GET")
-	mux.PathPrefix("/").Handler(http.FileServer(http.Dir("www/dist/www/")))
-	return mux
+// New returns a *mux.Mux with provided services injected
+func New() *mux.Mux {
+	server := mux.NewMux()
+	server.Map(mux.MatcherSet{mux.MatcherGET(), mux.MatcherLit("/api/things")}, GetThings(ThingService))
+	server.MapRgx("/*", AssetService)
+	return server
 }
 
 // GetThings is the endpoint for GET /api/things
