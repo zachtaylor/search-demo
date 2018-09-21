@@ -12,7 +12,7 @@ import (
 // New returns a *mux.Mux with provided services injected
 func New() *mux.Mux {
 	server := mux.NewMux()
-	server.Map(mux.MatcherSet{mux.MatcherGET(), mux.MatcherLit("/api/things")}, GetThings(ThingService))
+	server.Map(mux.Matches(mux.MatcherGET, mux.MatcherLit("/api/things")), GetThings(ThingService))
 	server.MapRgx("/*", AssetService)
 	return server
 }
