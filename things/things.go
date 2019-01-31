@@ -8,12 +8,8 @@ type Thing struct {
 	Data string
 }
 
-// Things is array of Thing, which provides Service
-type Things []Thing
-
-// GetThings provides ThingService
-//
-// Returns itself and nil, always
-func (things Things) GetThings() ([]Thing, error) {
-	return things, nil
+// Service provides Things from somewhere
+type Service interface {
+	// GetThings returns the Things, and error if any
+	GetThings() ([]Thing, error)
 }
