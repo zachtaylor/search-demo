@@ -1,11 +1,10 @@
 package server
 
 import (
-	"net/http"
-
 	"github.com/zachtaylor/search-demo/things"
+	"ztaylor.me/gops"
 )
 
 var ThingService things.Service
 
-var AssetService http.Handler
+var AssetService gops.Handler

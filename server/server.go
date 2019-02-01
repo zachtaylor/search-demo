@@ -2,36 +2,41 @@ package server
 
 import (
 	"encoding/json"
-	"net/http"
 
 	"github.com/zachtaylor/search-demo/things"
-	"ztaylor.me/http/mux"
+	"ztaylor.me/gops"
+	"ztaylor.me/gops/http"
 	"ztaylor.me/log"
 )
 
-// New returns a *mux.Mux with provided services injected
-func New() *mux.Mux {
-	server := mux.NewMux()
-	server.Map(mux.Matches(mux.MatcherGET, mux.MatcherLit("/api/things")), GetThings(ThingService))
-	server.MapRgx("/*", AssetService)
-	return server
+// New returns a gops.Handler with provided services injected
+func New(things things.Service, assets http.FileSystem) gops.Handler {
+	return gops.Mux{
+		gops.New(
+			gops.RouterSet(
+				gops.RouterGET,
+				gops.RouterPath("/api/things"),
+			),
+			GetThings(things),
+		),
+	}
 }
 
 // GetThings is the endpoint for GET /api/things
 //
 // Load the things, and write them
-func GetThings(thingService things.Service) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
+func GetThings(thingService things.Service) gops.HandlerFunc {
+	return func(i gops.In, o gops.Out) {
 		things, err := thingService.GetThings()
 		if err != nil {
-			log.Add("Request", r).Add("Error", err).Error("GET /api/things: failed to thingService.GetThings()")
-			w.WriteHeader(500)
+			log.Add("Request", i).Add("Error", err).Error("GET /api/things: failed to thingService.GetThings()")
+			o.StatusCode(500)
 		} else if json, err := json.Marshal(things); err != nil {
-			log.Add("Request", r).Add("Error", err).Error("GET /api/things: failed to json.Marshal(things)")
-			w.WriteHeader(500)
+			log.Add("Request", i).Add("Error", err).Error("GET /api/things: failed to json.Marshal(things)")
+			o.StatusCode(500)
 		} else {
-			w.Header().Add("Content-Type", "application/json")
-			w.Write(json)
+			o.Header("Content-Type", "application/json")
+			o.Write(json)
 		}
 	}
 }

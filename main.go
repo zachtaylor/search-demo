@@ -1,19 +1,22 @@
 package main
 
 import (
-	"net/http"
-
 	"github.com/zachtaylor/search-demo/server"
-	"github.com/zachtaylor/search-demo/things"
+	"ztaylor.me/gops"
+	"ztaylor.me/gops/http"
+)
+
+// Plugin is to be imported by GoPS
+var Plugin = gops.New(
+	gops.RouterDomain("search-demo.ztaylor.me"),
+	handler,
+)
+
+// inject services into server
+var handler = server.New(
+	Things,
+	http.Dir("/srv/www/search-demo.ztaylor.me/"),
 )
 
 func main() {
-	// inject services into server
-	// change thingService to real provider probably
-	server.ThingService = things.Default
-	server.AssetService = http.FileServer(http.Dir("www/dist/www/"))
-
-	server := server.New()
-
-	server.ListenAndServe(":80")
 }
